@@ -1,1 +1,1 @@
-"# 19-practice-helm" 
+        sh "export KUBECONFIG=/home/jenkins/.kube/kubeconfig_npe;helm upgrade  --wait --timeout 200 --install helm-poc-green ./helm-deployment-poc;helm status helm-poc-green"

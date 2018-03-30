@@ -1,0 +1,51 @@
+apiVersion: extensions/v1beta1 # for versions before 1.8.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: poc-helloworld-deployment
+  labels:
+    app: poc-helloworld-deployment
+spec:
+  replicas: {{ .Values.helloworldreplica}}
+  selector:
+    matchLabels:
+      app: poc-helloworld-template
+  template:
+    metadata:
+      labels:
+        app: poc-helloworld-template
+    spec:
+      containers:
+      - name: poc-helloworld-container
+        image: quay-enterprise.npe.ac2.io/nextgen/helloworld-image:0.0.1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: version
+          value: "1"
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 200m
+            memory: 300Mi
+          limits:
+            cpu: 700m
+            memory: 1Gi
+        securityContext:
+          privileged: false
+          # defines the health checking
+        readinessProbe:
+          # an http probe
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTP
+          # length of time to wait for a pod to initialize
+          # after pod startup, before applying health checking
+          initialDelaySeconds: 120
+          timeoutSeconds: 10
+      imagePullSecrets:
+          - name: nextgen-jenkins-pull-secret
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
